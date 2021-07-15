@@ -1,4 +1,4 @@
-import Ship from '../src/model'
+import Ship from '../src/model/Ship';
 
 test('returns an object', () => {
   const ship = Ship(4);
