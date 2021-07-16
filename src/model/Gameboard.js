@@ -13,6 +13,7 @@ class Gameboard {
     const clone = _.cloneDeep(this);
     const cloneShip = _.cloneDeep(ship);
     clone.ships.push(cloneShip);
+    const shipId = clone.ships.indexOf(cloneShip);
     // Now we handle placement. This depends on the direction
     // of the ship, which can be either horizontal or vertical.
     if (direction === 'row') {
@@ -20,7 +21,7 @@ class Gameboard {
         if (index >= y && index < y + ship.length) {
           return {
             status: 'filled',
-            ship: cloneShip,
+            ship: shipId,
           };
         }
         return col;
@@ -30,7 +31,7 @@ class Gameboard {
       clone.coordinates = clone.coordinates.map((row, index) => {
         if (index >= x && index < x + ship.length) {
           // Fit in our new column
-          return [...row.slice(0, y), { status: 'filled', ship: cloneShip }, ...row.slice(y + 1)];
+          return [...row.slice(0, y), { status: 'filled', ship: shipId }, ...row.slice(y + 1)];
         }
         return row;
       });
@@ -42,12 +43,26 @@ class Gameboard {
   // This ensures we only mutate the object locally.
   receiveAttack([x, y]) {
     const { status } = this.coordinates[x][y];
+    if (!Gameboard.checkValidAttack(status)) {
+      return this;
+    }
     const result = (status === 'empty') ? 'miss' : 'hit';
     const clone = _.cloneDeep(this);
     clone.coordinates[x][y].status = result;
-    const { ship } = clone.coordinates[x][y];
-    clone.coordinates[x][y].ship = ship?.hit?.(2) || null;
+    if (result === 'hit') {
+      const shipId = clone.coordinates[x][y].ship;
+      const ship = clone.ships[shipId];
+      clone.ships[shipId] = ship.hit();
+    }
     return clone;
+  }
+
+  checkAllShipsSunk() {
+    return this.ships.filter((x) => x.isSunk()).length === this.ships.length;
+  }
+
+  static checkValidAttack(status) {
+    return status === 'empty' || status === 'filled';
   }
 }
 
