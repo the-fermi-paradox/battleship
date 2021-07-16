@@ -12,8 +12,8 @@ test('has a length', () => {
 
 test('hit() increases number of hits', () => {
   const ship = new Ship(5);
-  const clone = ship.hit(4);
-  expect(clone.hits).toBe(1);
+  const clone = ship.hit().hit();
+  expect(clone.hits).toBe(2);
 });
 
 test('sunk detects sunken ships', () => {

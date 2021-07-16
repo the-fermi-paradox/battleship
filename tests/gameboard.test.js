@@ -17,9 +17,7 @@ test('places ship at coordinates', () => {
   expect(gameboard.placeShip(ship, [0, 0], 'row').coordinates[0][3])
     .toEqual(expect.objectContaining({
       status: 'filled',
-      ship: expect.objectContaining({
-        length: 4,
-      }),
+      ship: expect.any(Number),
     }));
 });
 
