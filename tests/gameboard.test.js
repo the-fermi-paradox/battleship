@@ -28,3 +28,10 @@ test('receives attacks', () => {
   const gameboard2 = gameboard.receiveAttack([0, 0]);
   expect(gameboard2.coordinates[0][0].status).toBe('miss');
 });
+
+test('registers hits', () => {
+  const gameboard = new Gameboard();
+  const ship = new Ship(4);
+  const round2 = gameboard.placeShip(ship, [0, 5]).receiveAttack([0, 8]);
+  expect(round2.coordinates[0][8].status).toBe('hit');
+});
