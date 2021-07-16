@@ -1,34 +1,29 @@
 import Ship from '../src/model/Ship';
 
 test('returns an object', () => {
-  const ship = Ship(4);
+  const ship = new Ship(4);
   expect(typeof ship).toBe('object');
 });
 
 test('has a length', () => {
-  const ship = Ship(4);
+  const ship = new Ship(4);
   expect(ship.length).toBe(4);
 });
 
 test('hit() marks position', () => {
-  const ship = Ship(5);
-  ship.hit(4);
-  expect(ship.positions[4]).toBe(1);
-}); 
+  const ship = new Ship(5);
+  const clone = ship.hit(4);
+  expect(clone.positions[4]).toBe(1);
+});
 
 test('isSunk() detects sunken ships', () => {
-  const ship = Ship(4);
-  ship.hit(0);
-  ship.hit(1);
-  ship.hit(2);
-  ship.hit(3);
-  expect(ship.isSunk()).toBe(true);
+  const ship = new Ship(4);
+  const clone = ship.hit(0).hit(1).hit(2).hit(3);
+  expect(clone.isSunk()).toBe(true);
 });
 
 test('isSunk() detects normal ships', () => {
-  const ship = Ship(4);
-  ship.hit(0);
-  ship.hit(1);
-  ship.hit(2);
-  expect(ship.isSunk()).toBe(false);
+  const ship = new Ship(4);
+  const clone = ship.hit(0).hit(1).hit(2);
+  expect(clone.isSunk()).toBe(false);
 });

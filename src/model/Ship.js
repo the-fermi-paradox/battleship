@@ -1,20 +1,22 @@
-const Ship = (length) => {
-  const positions = Array(length);
-  const hit = (int) => {
-    positions[int] = 1;
-  };
-  const isSunk = () => {
-    if (positions.includes(undefined)) {
+import _ from 'lodash';
+
+class Ship {
+  constructor(length) {
+    this.positions = Array(length);
+    this.length = length;
+  }
+
+  hit(int) {
+    const clone = _.cloneDeep(this);
+    clone.positions[int] = 1;
+    return clone;
+  }
+
+  isSunk() {
+    if (this.positions.includes(undefined)) {
       return false;
     }
     return true;
-  };
-  return {
-    length,
-    hit,
-    isSunk,
-    positions,
-  };
-};
-
+  }
+}
 export default Ship;
