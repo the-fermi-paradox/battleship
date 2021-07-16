@@ -14,7 +14,7 @@ test('has coordinates we can access', () => {
 test('places ship at coordinates', () => {
   const gameboard = new Gameboard();
   const ship = new Ship(4);
-  expect(gameboard.placeShip(ship, [0, 0]).coordinates[0][3])
+  expect(gameboard.placeShip(ship, [0, 0], 'row').coordinates[0][3])
     .toEqual(expect.objectContaining({
       status: 'filled',
       ship: expect.objectContaining({
@@ -32,6 +32,13 @@ test('receives attacks', () => {
 test('registers hits', () => {
   const gameboard = new Gameboard();
   const ship = new Ship(4);
-  const round2 = gameboard.placeShip(ship, [0, 5]).receiveAttack([0, 8]);
+  const round2 = gameboard.placeShip(ship, [0, 5], 'row').receiveAttack([0, 8]);
   expect(round2.coordinates[0][8].status).toBe('hit');
+});
+
+test('registers vertical hits', () => {
+  const gameboard = new Gameboard();
+  const ship = new Ship(4);
+  const round2 = gameboard.placeShip(ship, [0, 0], 'column').receiveAttack([3, 0]);
+  expect(round2.coordinates[3][0].status).toBe('hit');
 });
