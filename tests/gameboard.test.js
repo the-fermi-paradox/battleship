@@ -14,12 +14,18 @@ test('has coordinates we can access', () => {
 test('places ship at coordinates', () => {
   const gameboard = Gameboard();
   const ship = Ship(4);
-  gameboard.placeShip(0, ship);
-  expect(gameboard.ships).toContain(ship);
-  expect(gameboard.coordinates[0, 4]).toBe(ship);
+  const gameboard2 = gameboard.placeShip(gameboard, ship);
+  expect(gameboard2.ships.length).toBe(1);
+  expect(gameboard2.coordinates[0][4]).toBe(expect.objectContaining({
+    status: 'filled',
+    ship: expect.objectContaining({
+      length: 4,
+    }),
+  }));
 });
 
 test('receives attacks', () => {
   const gameboard = Gameboard();
-  expect(gameboard.receiveAttack([0, 0])).toBe('miss');
+  const gameboard2 = gameboard.receiveAttack(gameboard, [0, 0]);
+  expect(gameboard2.coordinates[0][0].status).toBe('miss');
 });
