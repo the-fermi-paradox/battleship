@@ -2,21 +2,18 @@ import _ from 'lodash';
 
 class Ship {
   constructor(length) {
-    this.positions = Array(length);
+    this.hits = 0;
     this.length = length;
   }
 
-  hit(int) {
+  hit() {
     const clone = _.cloneDeep(this);
-    clone.positions[int] = 1;
+    clone.hits += 1;
     return clone;
   }
 
   isSunk() {
-    if (this.positions.includes(undefined)) {
-      return false;
-    }
-    return true;
+    return this.hits >= this.length;
   }
 }
 export default Ship;
