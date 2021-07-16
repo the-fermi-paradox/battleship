@@ -7,29 +7,46 @@ class Gameboard {
     this.ships = [];
   }
 
-  placeShip(ship, [x, y]) {
+  // Placing ships should only ever hapnen in the startup
+  // phase; even so, we maintain our immutable doctrine here
+  placeShip(ship, [x, y], direction) {
     const clone = _.cloneDeep(this);
     const cloneShip = _.cloneDeep(ship);
     clone.ships.push(cloneShip);
-    clone.coordinates[x] = clone.coordinates[x].map((ele, index) => {
-      if (index >= y && index < y + ship.length) {
-        return {
-          status: 'filled',
-          ship: cloneShip,
-        };
-      }
-      return ele;
-    });
+    // Now we handle placement. This depends on the direction
+    // of the ship, which can be either horizontal or vertical.
+    if (direction === 'row') {
+      clone.coordinates[x] = clone.coordinates[x].map((col, index) => {
+        if (index >= y && index < y + ship.length) {
+          return {
+            status: 'filled',
+            ship: cloneShip,
+          };
+        }
+        return col;
+      });
+    }
+    if (direction === 'column') {
+      clone.coordinates = clone.coordinates.map((row, index) => {
+        if (index >= x && index < x + ship.length) {
+          // Fit in our new column
+          return [...row.slice(0, y), { status: 'filled', ship: cloneShip }, ...row.slice(y + 1)];
+        }
+        return row;
+      });
+    }
     return clone;
   }
 
+  // When we receive attacks, we deep copy the parent gameboard.
+  // This ensures we only mutate the object locally.
   receiveAttack([x, y]) {
     const { status } = this.coordinates[x][y];
     const result = (status === 'empty') ? 'miss' : 'hit';
     const clone = _.cloneDeep(this);
     clone.coordinates[x][y].status = result;
-    const ship = clone.coordinates[x][y]?.ship;
-    clone.coordinates[x][y].ship = ship?.hit?.(ship, [x, y]) || null;
+    const { ship } = clone.coordinates[x][y];
+    clone.coordinates[x][y].ship = ship?.hit?.(2) || null;
     return clone;
   }
 }
