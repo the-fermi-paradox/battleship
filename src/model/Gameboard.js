@@ -28,8 +28,8 @@ class Gameboard {
     const result = (status === 'empty') ? 'miss' : 'hit';
     const clone = _.cloneDeep(this);
     clone.coordinates[x][y].status = result;
-    const ship = clone.coordinates[x][y]?.ship;
-    clone.coordinates[x][y].ship = ship?.hit?.(ship, [x, y]) || null;
+    const { ship } = clone.coordinates[x][y];
+    clone.coordinates[x][y].ship = ship?.hit?.(2) || null;
     return clone;
   }
 }
