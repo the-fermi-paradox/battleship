@@ -1,32 +1,37 @@
 import _ from 'lodash';
 
-const Gameboard = () => {
-  const coordinates = Array(10).fill(0)
-    .map(() => Array(10).fill({ status: 'empty', ship: {} }));
+class Gameboard {
+  constructor() {
+    this.coordinates = Array(10).fill(0)
+      .map(() => Array(10).fill({ status: 'empty', ship: null }));
+    this.ships = [];
+  }
 
-  const ships = [];
-  const placeShip = (game, ship) => {
-    const clone = _.cloneDeep(game);
+  placeShip(ship, [x, y]) {
+    const clone = _.cloneDeep(this);
     const cloneShip = _.cloneDeep(ship);
     clone.ships.push(cloneShip);
+    clone.coordinates[x] = clone.coordinates[x].map((ele, index) => {
+      if (index >= y && index < y + ship.length) {
+        return {
+          status: 'filled',
+          ship: cloneShip,
+        };
+      }
+      return ele;
+    });
     return clone;
-  };
-  const receiveAttack = (game, [x, y]) => {
-    const { status } = game.coordinates[x][y];
+  }
+
+  receiveAttack([x, y]) {
+    const { status } = this.coordinates[x][y];
     const result = (status === 'empty') ? 'miss' : 'hit';
-    const clone = _.cloneDeep(game);
+    const clone = _.cloneDeep(this);
     clone.coordinates[x][y].status = result;
     const ship = clone.coordinates[x][y]?.ship;
-    console.log(ship);
-    clone.coordinates[x][y].ship = ship?.hit(ship, [x, y]) || null;
+    clone.coordinates[x][y].ship = ship?.hit?.(ship, [x, y]) || null;
     return clone;
-  };
-  return {
-    coordinates,
-    ships,
-    receiveAttack,
-    placeShip,
-  };
-};
+  }
+}
 
 export default Gameboard;
