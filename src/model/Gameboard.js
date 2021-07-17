@@ -3,7 +3,9 @@ import _ from 'lodash';
 class Gameboard {
   constructor() {
     this.coordinates = Array(10).fill(0)
-      .map(() => Array(10).fill({ status: 'empty', ship: null }));
+      .map(() => Array(10).fill(0))
+      .map((row, x) => row.map((cell, y) => ({ status: 'empty', ship: null, coords: [x, y] })))
+      .flat();
     this.ships = [];
   }
 
@@ -16,41 +18,47 @@ class Gameboard {
     const shipId = clone.ships.indexOf(cloneShip);
     // Now we handle placement. This depends on the direction
     // of the ship, which can be either horizontal or vertical.
+    // TODO: break this out into its own function
     if (direction === 'row') {
-      clone.coordinates[x] = clone.coordinates[x].map((col, index) => {
-        if (index >= y && index < y + ship.length) {
-          return {
-            status: 'filled',
-            ship: shipId,
-          };
+      clone.coordinates = clone.coordinates.map((cell) => {
+        if (cell.coords[0] === x && cell.coords[1] < y + ship.length) {
+          const cellClone = _.cloneDeep(cell);
+          cellClone.status = 'filled';
+          cellClone.ship = shipId;
+          return cellClone;
         }
-        return col;
+        return cell;
       });
     }
     if (direction === 'column') {
-      clone.coordinates = clone.coordinates.map((row, index) => {
-        if (index >= x && index < x + ship.length) {
-          // Fit in our new column
-          return [...row.slice(0, y), { status: 'filled', ship: shipId }, ...row.slice(y + 1)];
+      clone.coordinates = clone.coordinates.map((cell) => {
+        if (cell.coords[1] === y && cell.coords[0] < cell.coords[0] + ship.length) {
+          const cellClone = _.cloneDeep(cell);
+          cellClone.status = 'filled';
+          cellClone.ship = shipId;
+          return cellClone;
         }
-        return row;
+        return cell;
       });
     }
     return clone;
   }
 
+  lookupCoords([x, y]) {
+    return this.coordinates
+      .filter((ele) => ele.coords[0] === x && ele.coords[1] === y)[0];
+  }
+
   // When we receive attacks, we deep copy the parent gameboard.
   // This ensures we only mutate the object locally.
   receiveAttack([x, y]) {
-    const { status } = this.coordinates[x][y];
-    if (!Gameboard.checkValidAttack(status)) {
-      return this;
-    }
-    const result = (status === 'empty') ? 'miss' : 'hit';
     const clone = _.cloneDeep(this);
-    clone.coordinates[x][y].status = result;
+    const cell = clone.lookupCoords([x, y]);
+    const result = (cell.status === 'empty') ? 'miss' : 'hit';
+    cell.status = result;
+
     if (result === 'hit') {
-      const shipId = clone.coordinates[x][y].ship;
+      const shipId = clone.lookupCoords([x, y]).ship;
       const ship = clone.ships[shipId];
       clone.ships[shipId] = ship.hit();
     }
@@ -61,8 +69,16 @@ class Gameboard {
     return this.ships.filter((x) => x.isSunk()).length === this.ships.length;
   }
 
-  static checkValidAttack(status) {
+  checkValidAttack([x, y]) {
+    const { status } = this.lookupCoords([x, y]);
     return status === 'empty' || status === 'filled';
+  }
+
+  generateRandomCoordinates() {
+    const filtered = this.coordinates.map((row) => row
+      .filter((cell) => this.checkValidAttack(cell.coords)));
+
+    return _.sample(filtered).coords;
   }
 }
 
