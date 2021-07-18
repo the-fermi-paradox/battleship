@@ -75,10 +75,32 @@ class Gameboard {
   }
 
   generateRandomCoordinates() {
-    const filtered = this.coordinates.map((row) => row
-      .filter((cell) => this.checkValidAttack(cell.coords)));
+    const filtered = this.coordinates.filter((cell) => this.checkValidAttack(cell.coords));
 
     return _.sample(filtered).coords;
+  }
+
+  // Check for out of bounds coordinates or cells that are already filled
+  // Our grid is 10 x 10
+  checkValidCoordinates([x, y]) {
+    const cell = this.lookupCoords([x, y]);
+    return x < 10 && y < 10 && x > 0 && y > 0 && cell.status !== 'filled';
+  }
+
+  validateVertical([x, y], length) {
+    const toCheck = this.coordinates.filter((cell) =>
+      cell.coords[0] < x + length
+      && cell.coords[0] >= x
+      && cell.coords[1] === y);
+    return toCheck.reduce((acc, e, i) => acc && this.checkValidCoordinates([x + i, y]), true);
+  }
+
+  validateHorizontal([x, y], length) {
+    const toCheck = this.coordinates.filter((cell) =>
+      cell.coords[0] === x
+      && cell.coords[1] >= y
+      && cell.coords[1] < y + length);
+    return toCheck.reduce((acc, e, i) => acc && this.checkValidCoordinates([x, y + i]), true);
   }
 }
 
