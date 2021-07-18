@@ -84,7 +84,7 @@ class Gameboard {
   // Our grid is 10 x 10
   checkValidCoordinates([x, y]) {
     const cell = this.lookupCoords([x, y]);
-    return x < 10 && y < 10 && x > 0 && y > 0 && cell.status !== 'filled';
+    return x < 10 && y < 10 && x >= 0 && y >= 0 && cell.status !== 'filled';
   }
 
   validateVertical([x, y], length) {
@@ -92,7 +92,8 @@ class Gameboard {
       cell.coords[0] < x + length
       && cell.coords[0] >= x
       && cell.coords[1] === y);
-    return toCheck.reduce((acc, e, i) => acc && this.checkValidCoordinates([x + i, y]), true);
+    const toReturn = toCheck.map((e) => this.checkValidCoordinates([e.coords[0], e.coords[1]]));
+    return !toReturn.includes(false) && toReturn.length === length;
   }
 
   validateHorizontal([x, y], length) {
@@ -100,7 +101,8 @@ class Gameboard {
       cell.coords[0] === x
       && cell.coords[1] >= y
       && cell.coords[1] < y + length);
-    return toCheck.reduce((acc, e, i) => acc && this.checkValidCoordinates([x, y + i]), true);
+    const toReturn = toCheck.map((e) => this.checkValidCoordinates([e.coords[0], e.coords[1]]));
+    return !toReturn.includes(false) && toReturn.length === length;
   }
 }
 
