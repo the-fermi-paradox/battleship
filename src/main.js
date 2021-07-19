@@ -1,59 +1,71 @@
 import init from './init';
 import Ship from './model/Ship';
+import AI from './model/AI';
 
 (() => {
   const startingState = init();
   const history = [];
-  const ships = {
-    carrier: 5,
-    battleship: 4,
-    frigate: 3,
-    cruiser: 2,
-    patrol: 1,
-  };
+  const ships = [
+    new Ship(5),
+    new Ship(4),
+    new Ship(3),
+    new Ship(2),
+  ];
   const direction = 'column';
-  let shipSelected = null;
+  let ship = null;
+  let gameStarted = false;
   history.push(startingState);
+  const ai = new AI();
 
   document.body.addEventListener('click', (event) => {
+    // Handles clicking on a ship to select it
     if (event.target.classList.contains('ship')) {
-      shipSelected = event.target.name;
+      ship = ships[event.target.index];
       return;
     }
 
+    // Handles clicking on the player grid to place a ship
     if (event.target.classList.contains('cell')
-      && shipSelected) {
+      && ship) {
       const [x, y] = event.target.id.split('-');
-      const length = ships[shipSelected];
-      const state = history[history.length - 1];
+      const [aiBoard, plBoard] = history[history.length - 1];
+      const { length } = ship;
+      if ((direction === 'row' && plBoard.validateHorizontal([x, y], length))
+      || (direction === 'column' && plBoard.validateVertical([x, y], length))) {
+        const newPlBoard = plBoard.placeShip(ship, [x, y], direction);
+        // Remove the placed ship from the array of player ships
+        ships.splice(ships.indexOf(ship), 1);
+        ship = null;
 
-      if ((direction === 'row' && state[1].validateHorizontal([x, y], length))
-      || (direction === 'column' && state[1].validateVertical([x, y], length))) {
-        const ship = new Ship(length);
-        const player = state[1].placeShip(ship, [x, y], direction);
-        shipSelected = null;
-        // TODO: AI places ship
-        const temp = state[0];
-        history.push([temp, player]);
-        return;
+        const newAiBoard = ai.placeAIShip(aiBoard);
+
+        // TODO: Trigger next phase if ships are all placed
+        if (ships.length === 0) {
+          gameStarted = true;
+        }
+        history.push([newAiBoard, newPlBoard]);
       }
     }
 
+    // Don't handle these events if the game hasn't started yet
+    if (!gameStarted) return;
+
+    // Handles clicking on the AI grid to open fire
     if (event.target.classList.contains('cell')
     && event.target.classList.contains('ai')) {
-      const currentState = history[history.length - 1];
+      const [aiBoard, plBoard] = history[history.length - 1];
       const coordinates = event.target.id.split('-');
-      if (currentState[0].checkValidAttack(coordinates)) { return; }
+      if (aiBoard.checkValidAttack(coordinates)) { return; }
 
       // The player's turn is evaluated and a new board for the AI is generated
-      const aiBoard = currentState[0].receiveAttack(coordinates);
+      const newAIBoard = aiBoard.receiveAttack(coordinates);
 
       // It's now the AI's turn
-      const randCoords = currentState[1].generateRandomCoordinates();
-      const playerBoard = currentState[1].receiveAttack(randCoords);
+      const randCoords = plBoard.generateRandomCoordinates();
+      const newPlBoard = plBoard.receiveAttack(randCoords);
 
       // Record our new state
-      history.push([aiBoard, playerBoard]);
+      history.push([newAIBoard, newPlBoard]);
     }
   });
 })();
