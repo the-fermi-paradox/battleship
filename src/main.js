@@ -1,6 +1,7 @@
 import init from './init';
 import Ship from './model/Ship';
 import AI from './model/AI';
+import Render from './view/Render';
 
 (() => {
   const startingState = init();
@@ -16,6 +17,8 @@ import AI from './model/AI';
   let gameStarted = false;
   history.push(startingState);
   const ai = new AI();
+  Render.drawGameboard(startingState[0], 'ai');
+  Render.drawGameboard(startingState[1], 'player');
 
   document.body.addEventListener('click', (event) => {
     // Handles clicking on a ship to select it
@@ -33,11 +36,14 @@ import AI from './model/AI';
       if ((direction === 'row' && plBoard.validateHorizontal([x, y], length))
       || (direction === 'column' && plBoard.validateVertical([x, y], length))) {
         const newPlBoard = plBoard.placeShip(ship, [x, y], direction);
+        Render.drawGameboard(newPlBoard, 'player');
+
         // Remove the placed ship from the array of player ships
         ships.splice(ships.indexOf(ship), 1);
         ship = null;
 
         const newAiBoard = ai.placeAIShip(aiBoard);
+        Render.drawGameboard(newAiBoard, 'ai');
 
         // TODO: Trigger next phase if ships are all placed
         if (ships.length === 0) {
@@ -59,10 +65,12 @@ import AI from './model/AI';
 
       // The player's turn is evaluated and a new board for the AI is generated
       const newAIBoard = aiBoard.receiveAttack(coordinates);
+      Render.drawGameboard(newAIBoard, 'ai');
 
       // It's now the AI's turn
       const randCoords = plBoard.generateRandomCoordinates();
       const newPlBoard = plBoard.receiveAttack(randCoords);
+      Render.drawGameboard(newPlBoard, 'player');
 
       // Record our new state
       history.push([newAIBoard, newPlBoard]);
