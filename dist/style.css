@@ -1,0 +1,61 @@
+:root {
+  background-color: #1a1b26;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid {
+  width: 35vw;
+  height: 35vw;
+  margin: 2vw; 
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+
+.cell {
+  border: 1px solid black;
+}
+
+.cell:hover {
+  background-color: grey;
+}
+
+.ship-storage {
+  width: 35vw;
+  height: 35vw;
+}
+
+.ship {
+  margin-bottom: 3vw;
+  display: flex;
+  align-items: center;
+}
+
+.filled {
+  background-color: grey;
+}
+
+.ship-square {
+  border: 1px solid black;
+  background-color: grey;
+  min-width: 3.5vw;
+  min-height: 3.5vw;
+}

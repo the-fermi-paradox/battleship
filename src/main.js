@@ -17,20 +17,22 @@ import Render from './view/Render';
   let gameStarted = false;
   history.push(startingState);
   const ai = new AI();
-  Render.drawGameboard(startingState[0], 'ai');
   Render.drawGameboard(startingState[1], 'player');
+  Render.drawShips(ships);
 
   document.body.addEventListener('click', (event) => {
     // Handles clicking on a ship to select it
-    if (event.target.classList.contains('ship')) {
-      ship = ships[event.target.index];
+    if (event.target.closest('.ship')) {
+      console.log("I'm triggered!");
+      ship = ships[event.target.closest('.ship').id];
       return;
     }
 
     // Handles clicking on the player grid to place a ship
-    if (event.target.classList.contains('cell')
+    if (event.target.closest('.cell')
       && ship) {
-      const [x, y] = event.target.id.split('-');
+      const self = event.target.closest('.cell');
+      const [x, y] = self.id.split('-').map((e) => parseInt(e, 10));
       const [aiBoard, plBoard] = history[history.length - 1];
       const { length } = ship;
       if ((direction === 'row' && plBoard.validateHorizontal([x, y], length))
@@ -41,15 +43,19 @@ import Render from './view/Render';
         // Remove the placed ship from the array of player ships
         ships.splice(ships.indexOf(ship), 1);
         ship = null;
+        Render.drawShips(ships);
 
         const newAiBoard = ai.placeAIShip(aiBoard);
-        Render.drawGameboard(newAiBoard, 'ai');
 
         // TODO: Trigger next phase if ships are all placed
         if (ships.length === 0) {
           gameStarted = true;
+          document.getElementById('ship-storage').remove();
+          Render.drawGameboard(newPlBoard, 'player');
+          Render.drawGameboard(newAiBoard, 'ai');
         }
         history.push([newAiBoard, newPlBoard]);
+        return;
       }
     }
 
@@ -60,18 +66,16 @@ import Render from './view/Render';
     if (event.target.classList.contains('cell')
     && event.target.classList.contains('ai')) {
       const [aiBoard, plBoard] = history[history.length - 1];
-      const coordinates = event.target.id.split('-');
-      if (aiBoard.checkValidAttack(coordinates)) { return; }
+      const [x, y] = event.target.id.split('-').map((e) => parseInt(e, 10));
+      if (!aiBoard.checkValidAttack([x, y])) { return; }
 
       // The player's turn is evaluated and a new board for the AI is generated
-      const newAIBoard = aiBoard.receiveAttack(coordinates);
-      Render.drawGameboard(newAIBoard, 'ai');
-
+      const newAIBoard = aiBoard.receiveAttack([x, y]);
       // It's now the AI's turn
       const randCoords = plBoard.generateRandomCoordinates();
       const newPlBoard = plBoard.receiveAttack(randCoords);
       Render.drawGameboard(newPlBoard, 'player');
-
+      Render.drawGameboard(newAIBoard, 'ai');
       // Record our new state
       history.push([newAIBoard, newPlBoard]);
     }

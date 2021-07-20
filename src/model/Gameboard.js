@@ -21,7 +21,7 @@ class Gameboard {
     // TODO: break this out into its own function
     if (direction === 'row') {
       clone.coordinates = clone.coordinates.map((cell) => {
-        if (cell.coords[0] === x && cell.coords[1] < y + ship.length) {
+        if (cell.coords[0] === x && cell.coords[1] >= y && cell.coords[1] < y + ship.length) {
           const cellClone = _.cloneDeep(cell);
           cellClone.status = 'filled';
           cellClone.ship = shipId;
@@ -32,7 +32,7 @@ class Gameboard {
     }
     if (direction === 'column') {
       clone.coordinates = clone.coordinates.map((cell) => {
-        if (cell.coords[1] === y && cell.coords[0] < cell.coords[0] + ship.length) {
+        if (cell.coords[1] === y && cell.coords[0] >= x && cell.coords[0] < x + ship.length) {
           const cellClone = _.cloneDeep(cell);
           cellClone.status = 'filled';
           cellClone.ship = shipId;
@@ -80,19 +80,28 @@ class Gameboard {
     return _.sample(filtered).coords;
   }
 
+  generateRandomShipCoordinates(direction, length) {
+    return _.sample(this.coordinates.filter((cell) => {
+      const [x, y] = cell.coords;
+      return (direction === 'column')
+        ? this.validateVertical([x, y], length)
+        : this.validateHorizontal([x, y], length);
+    })).coords;
+  }
+
   // Check for out of bounds coordinates or cells that are already filled
   // Our grid is 10 x 10
-  checkValidCoordinates([x, y]) {
-    const cell = this.lookupCoords([x, y]);
+  static checkValidCoordinates(cell) {
+    const [x, y] = cell.coords;
     return x < 10 && y < 10 && x >= 0 && y >= 0 && cell.status !== 'filled';
   }
 
   validateVertical([x, y], length) {
     const toCheck = this.coordinates.filter((cell) =>
-      cell.coords[0] < x + length
+      cell.coords[0] < (x + length)
       && cell.coords[0] >= x
       && cell.coords[1] === y);
-    const toReturn = toCheck.map((e) => this.checkValidCoordinates([e.coords[0], e.coords[1]]));
+    const toReturn = toCheck.map((e) => Gameboard.checkValidCoordinates(e));
     return !toReturn.includes(false) && toReturn.length === length;
   }
 
@@ -101,7 +110,7 @@ class Gameboard {
       cell.coords[0] === x
       && cell.coords[1] >= y
       && cell.coords[1] < y + length);
-    const toReturn = toCheck.map((e) => this.checkValidCoordinates([e.coords[0], e.coords[1]]));
+    const toReturn = toCheck.map((e) => Gameboard.checkValidCoordinates(e));
     return !toReturn.includes(false) && toReturn.length === length;
   }
 }
