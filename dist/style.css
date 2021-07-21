@@ -1,5 +1,5 @@
 :root {
-  background-color: #1a1b26;
+  background-color:#3D3D3D;
   width: 100%;
   height: 100%;
   padding: 0;
@@ -7,11 +7,15 @@
 }
 
 body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
 }
+
 main {
   width: 100%;
   height: 100%;
@@ -31,12 +35,18 @@ main {
 }
 
 .cell {
-  border: 1px solid black;
+  background-color: #1B3659;
+  border: 1px solid #959595;
 }
 
 .cell:hover {
+  cursor: crosshair;
+}
+
+.highlight {
   background-color: grey;
 }
+
 
 .ship-storage {
   width: 35vw;
@@ -50,12 +60,20 @@ main {
 }
 
 .filled {
-  background-color: grey;
+  background-color: #121212;
+}
+
+.hit {
+  background-color: red;
+}
+
+.miss {
+  background-color: blue;
 }
 
 .ship-square {
   border: 1px solid black;
-  background-color: grey;
+  background-color: #121212;
   min-width: 3.5vw;
   min-height: 3.5vw;
 }

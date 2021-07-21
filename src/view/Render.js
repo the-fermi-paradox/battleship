@@ -1,4 +1,44 @@
 class Render {
+  static displayVictory() {
+    document.getElementById('main').remove();
+    const victoryText = document.createElement('h1');
+    victoryText.textContent = 'You are victorious!';
+    document.body.append(victoryText);
+  }
+
+  static displayGameOver() {
+    document.getElementById('main').remove();
+    const defeatText = document.createElement('h1');
+    defeatText.textContent = 'Game Over';
+    document.body.append(defeatText);
+  }
+
+  static clearHighlight([x, y], ship, direction) {
+    for (let i = 0; i < ship.length; i += 1) {
+      if (direction === 'row') {
+        const result = document.getElementById(`${x}-${y + i}`);
+        result?.classList?.remove('highlight');
+      }
+      if (direction === 'column') {
+        const result = document.getElementById(`${x + i}-${y}`);
+        result?.classList?.remove('highlight');
+      }
+    }
+  }
+
+  static addHighlight([x, y], ship, direction) {
+    for (let i = 0; i < ship.length; i += 1) {
+      if (direction === 'row') {
+        const result = document.getElementById(`${x}-${y + i}`);
+        result?.classList?.add('highlight');
+      }
+      if (direction === 'column') {
+        const result = document.getElementById(`${x + i}-${y}`);
+        result?.classList?.add('highlight');
+      }
+    }
+  }
+
   static drawGameboard(gameboard, player) {
     // Clear the old grid
     document.getElementById(player)?.remove();

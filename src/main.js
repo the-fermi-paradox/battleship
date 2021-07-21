@@ -12,7 +12,7 @@ import Render from './view/Render';
     new Ship(3),
     new Ship(2),
   ];
-  const direction = 'column';
+  let direction = 'column';
   let ship = null;
   let gameStarted = false;
   history.push(startingState);
@@ -20,10 +20,38 @@ import Render from './view/Render';
   Render.drawGameboard(startingState[1], 'player');
   Render.drawShips(ships);
 
+  document.body.addEventListener('contextmenu', (event) => {
+    if (ship) {
+      const oldDirection = direction;
+      event.preventDefault();
+      direction = (direction === 'column')
+        ? 'row'
+        : 'column';
+      if (event.target.closest('.cell')) {
+        const [x, y] = event.target.closest('.cell').id.split('-').map((e) => parseInt(e, 10));
+        Render.clearHighlight([x, y], ship, oldDirection);
+        Render.addHighlight([x, y], ship, direction);
+      }
+    }
+  });
+
+  document.body.addEventListener('mouseover', (event) => {
+    if (event.target.closest('.cell') && ship) {
+      const [x, y] = event.target.closest('.cell').id.split('-').map((e) => parseInt(e, 10));
+      Render.addHighlight([x, y], ship, direction);
+    }
+  });
+
+  document.body.addEventListener('mouseout', (event) => {
+    if (event.target.closest('.cell') && ship) {
+      const [x, y] = event.target.closest('.cell').id.split('-').map((e) => parseInt(e, 10));
+      Render.clearHighlight([x, y], ship, direction);
+    }
+  });
+
   document.body.addEventListener('click', (event) => {
     // Handles clicking on a ship to select it
     if (event.target.closest('.ship')) {
-      console.log("I'm triggered!");
       ship = ships[event.target.closest('.ship').id];
       return;
     }
@@ -74,6 +102,16 @@ import Render from './view/Render';
       // It's now the AI's turn
       const randCoords = plBoard.generateRandomCoordinates();
       const newPlBoard = plBoard.receiveAttack(randCoords);
+
+      if (newPlBoard.checkAllShipsSunk()) {
+        Render.displayGameOver();
+        return;
+      }
+      if (newAIBoard.checkAllShipsSunk()) {
+        Render.displayVictory();
+        return;
+      }
+
       Render.drawGameboard(newPlBoard, 'player');
       Render.drawGameboard(newAIBoard, 'ai');
       // Record our new state
