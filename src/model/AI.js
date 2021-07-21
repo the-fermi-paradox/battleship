@@ -11,13 +11,9 @@ class AI {
   }
 
   placeAIShip(board) {
-    let coords = [15, 15];
     const direction = Math.random() > 0.5 ? 'column' : 'row';
     const ship = this.ships.pop();
-    while (!(direction === 'row' && board.validateHorizontal(coords, ship.length))
-      || !(direction === 'column' && board.validateVertical(coords, ship.length))) {
-      coords = board.generateRandomCoordinates();
-    }
+    const coords = board.generateRandomShipCoordinates(direction, ship.length);
     return board.placeShip(ship, coords, direction);
   }
 }

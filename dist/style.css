@@ -1,0 +1,79 @@
+:root {
+  background-color:#3D3D3D;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid {
+  width: 35vw;
+  height: 35vw;
+  margin: 2vw; 
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+
+.cell {
+  background-color: #1B3659;
+  border: 1px solid #959595;
+}
+
+.cell:hover {
+  cursor: crosshair;
+}
+
+.highlight {
+  background-color: grey;
+}
+
+
+.ship-storage {
+  width: 35vw;
+  height: 35vw;
+}
+
+.ship {
+  margin-bottom: 3vw;
+  display: flex;
+  align-items: center;
+}
+
+.filled {
+  background-color: #121212;
+}
+
+.hit {
+  background-color: red;
+}
+
+.miss {
+  background-color: blue;
+}
+
+.ship-square {
+  border: 1px solid black;
+  background-color: #121212;
+  min-width: 3.5vw;
+  min-height: 3.5vw;
+}
