@@ -7,12 +7,14 @@ import Render from './view/Render';
   const startingState = init();
   const history = [];
   const ships = [
+    new Ship(6),
     new Ship(5),
     new Ship(4),
     new Ship(3),
     new Ship(2),
   ];
   let direction = 'column';
+  let lastAIAttack = null;
   let ship = null;
   let gameStarted = false;
   history.push(startingState);
@@ -100,8 +102,12 @@ import Render from './view/Render';
       // The player's turn is evaluated and a new board for the AI is generated
       const newAIBoard = aiBoard.receiveAttack([x, y]);
       // It's now the AI's turn
-      const randCoords = plBoard.generateRandomCoordinates();
+      const randCoords = plBoard.generateRandomCoordinates(lastAIAttack);
       const newPlBoard = plBoard.receiveAttack(randCoords);
+      const lastAttack = newPlBoard.lookupCoords(randCoords);
+      if (lastAttack.status === 'hit') {
+        lastAIAttack = lastAttack;
+      }
 
       if (newPlBoard.checkAllShipsSunk()) {
         Render.displayGameOver();
