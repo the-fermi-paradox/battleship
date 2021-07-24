@@ -3,6 +3,7 @@ import Ship from './Ship';
 class AI {
   constructor() {
     this.ships = [
+      new Ship(6),
       new Ship(5),
       new Ship(4),
       new Ship(3),

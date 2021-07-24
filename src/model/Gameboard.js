@@ -74,10 +74,24 @@ class Gameboard {
     return status === 'empty' || status === 'filled';
   }
 
-  generateRandomCoordinates() {
-    const filtered = this.coordinates.filter((cell) => this.checkValidAttack(cell.coords));
-
-    return _.sample(filtered).coords;
+  generateRandomCoordinates(lastAIAttack) {
+    if (lastAIAttack?.status === 'hit') {
+      const targets = this.coordinates.filter((cell) => this.checkValidAttack(cell.coords)
+        // These are the adjacent coordinates in our grid
+        && ((cell.coords[0] === lastAIAttack.coords[0] + 1
+          && cell.coords[1] === lastAIAttack.coords[1])
+        || (cell.coords[0] === lastAIAttack.coords[0] - 1
+          && cell.coords[1] === lastAIAttack.coords[1])
+        || (cell.coords[1] === lastAIAttack.coords[1] + 1
+          && cell.coords[0] === lastAIAttack.coords[0])
+        || (cell.coords[1] === lastAIAttack.coords[1] - 1
+          && cell.coords[0] === lastAIAttack.coords[0])
+        ));
+      if (targets.length) {
+        return _.sample(targets).coords;
+      }
+    }
+    return _.sample(this.coordinates.filter((cell) => this.checkValidAttack(cell.coords))).coords;
   }
 
   generateRandomShipCoordinates(direction, length) {
